@@ -1,5 +1,5 @@
 {
-  "name": "@jigutierrez/react-config-loader",
+  "name": "react-config-loader",
   "version": "0.0.1",
   "description": "React Hook for loading client-side configuration at runtime.",
   "private": "false",
