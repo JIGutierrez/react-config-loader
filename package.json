@@ -1,9 +1,16 @@
 {
-  "name": "react-config-loader",
+  "name": "@jigutierrez/react-config-loader",
   "version": "1.0.0",
   "description": "",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JIGutierrez/react-config-loader.git"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  },
   "files": [
     "dist"
   ],
