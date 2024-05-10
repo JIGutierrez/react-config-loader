@@ -9,7 +9,7 @@
     "url": "https://github.com/JIGutierrez/react-config-loader.git"
   },
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   },
   "files": [
     "dist"
