@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { setupConfig } from '../setupConfig';
-import { ConfigDef } from '../types';
+import type { ConfigDef } from '../types';
 import { render, renderHook, waitFor } from '@testing-library/react';
 
 interface ConfigExample {

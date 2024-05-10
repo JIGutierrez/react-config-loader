@@ -6,10 +6,15 @@ import peerDepsExternal from 'rollup-plugin-peer-deps-external';
 
 import packageJson from "./package.json" assert { type: "json"};
 import terser from "@rollup/plugin-terser";
+import { root } from "./.eslintrc.cjs";
 
 export default [
   {
     input: "src/index.ts",
+    onwarn: function (warning, warn) {
+      if (/use client/.test(warning.message)) return;
+      warn(warning);
+    },
     output: [
       {
         file: packageJson.main,
@@ -26,7 +31,7 @@ export default [
       peerDepsExternal(),
       resolve(),
       commonjs(),
-      typescript({ tsconfig: "./tsconfig.json" }),
+      typescript({ tsconfig: "./tsconfig.json", exclude: ["src/test/*"] }),
       // terser()
     ],
     external: ["react-dom"],

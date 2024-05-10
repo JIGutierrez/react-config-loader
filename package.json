@@ -8,6 +8,9 @@
     "type": "git",
     "url": "https://github.com/JIGutierrez/react-config-loader.git"
   },
+  "np": {
+    "contents:": "dist"
+  },
   "publishConfig": {
     "access": "public"
   },

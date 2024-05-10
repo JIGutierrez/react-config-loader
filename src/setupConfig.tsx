@@ -4,7 +4,7 @@ import {
   QueryClientProvider,
   useQuery,
 } from '@tanstack/react-query';
-import { ConfigDef, ConfigOptions, ConfigUpdater } from './types';
+import type { ConfigDef, ConfigOptions, ConfigUpdater } from './types';
 import React from 'react';
 import { createConfigFromDefinition } from './createConfigFromDefinition';
 
@@ -28,7 +28,7 @@ export function setupConfig<T extends object>(
   const queryClient = new QueryClient();
   const provider = ConfigProvider(queryClient);
 
-  const hook = useConfigCreator(
+  const hook = useConfigCreator<T>(
     createConfigFromDefinition(initialConfig),
     updater,
     Object.assign({}, defaultOptions, options)

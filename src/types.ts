@@ -1,7 +1,7 @@
 import { QueryClientConfig, QueryOptions, UseQueryOptions } from '@tanstack/react-query';
 import type { Dispatch } from 'react';
 
-type ConfigDef<T extends object> = {
+export type ConfigDef<T extends object> = {
   [K in RequiredKeys<T>]: RequiredConfigDefinition<T[K]>;
 } & {
   [K in Exclude<keyof T, RequiredKeys<T>>]?: OptionalConfigDefinition<T[K]>;
@@ -28,7 +28,7 @@ interface RequiredConfigDefinition<V> extends OptionalConfigDefinition<V> {
 
 export type ConfigUpdater<T> = () => Promise<T>;
 
-type ConfigOptions = {
+export type ConfigOptions = {
   staleTime?: number;
   refetchOnMount?: boolean;
   retryDelay?: number | ((retryCount: number, error: Error) => number);

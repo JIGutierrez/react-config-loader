@@ -1,7 +1,7 @@
-import { createConfig } from '../index';
+import { setupConfig } from '../index';
 
 describe('index', () => {
   it('exports required functions', () => {
-    expect(createConfig).toBeDefined();
+    expect(setupConfig).toBeDefined();
   });
 });
