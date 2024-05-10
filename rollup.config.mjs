@@ -32,7 +32,7 @@ export default [
       resolve(),
       commonjs(),
       typescript({ tsconfig: "./tsconfig.json", exclude: ["src/test/*"] }),
-      // terser()
+      terser()
     ],
     external: ["react-dom"],
   },
