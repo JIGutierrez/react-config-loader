@@ -21,7 +21,8 @@
   "scripts": {
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
     "test": "jest",
-    "build": "rimraf dist && rollup -c"
+    "build": "rimraf dist && rollup -c",
+    "release": "npm run build && np"
   },
   "author": "JIGutierrez",
   "license": "ISC",
@@ -48,6 +49,7 @@
     "eslint-plugin-react-hooks": "^4.6.2",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
+    "np": "^10.0.5",
     "prettier": "^3.2.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
