@@ -1,0 +1,12 @@
+src/
+node_modules/
+.vscode
+jest.config.json
+package-lock.json
+jest.config.ts
+.eslintrc.cjs
+babel.config.js
+.prettier.json
+rollup.config.mjs
+tsconfig.json
+.gitignore
