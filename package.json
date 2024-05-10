@@ -14,7 +14,7 @@
   "files": [
     "dist"
   ],
-  "types": "dist/types/index.d.ts",
+  "types": "dist/index.d.ts",
   "scripts": {
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
     "test": "jest",
