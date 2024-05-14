@@ -1,10 +1,11 @@
 import React, { useEffect } from 'react';
 import { setupConfig } from '../setupConfig';
-import type { ConfigDef } from '../types';
+import type { ConfigDef, SetupConfigOptions } from '../types';
 import { act, render, renderHook, waitFor } from '@testing-library/react';
 import nock from 'nock';
 import axios from 'axios';
 import { QueryClient, useIsRestoring } from '@tanstack/react-query';
+import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 
 axios.defaults.adapter = 'http';
 
@@ -27,6 +28,18 @@ const initialConfigDef: ConfigDef<ConfigExample> = {
     initialValue: 0,
   },
 };
+
+const storageKey = 'REACT_QUERY_OFFLINE_CACHE';
+
+function testStorageCache<V>(storage: Storage, key: string, value?: V, index: number = 0): void {
+  const data: Record<string, V> = JSON.parse(storage.getItem(storageKey) || '')?.clientState
+    ?.queries[index]?.state?.data;
+  expect(data).toBeDefined();
+  expect(data).toHaveProperty(key);
+  if (value) {
+    expect(data[key]).toEqual(value);
+  }
+}
 
 const staticUpdater = async () => initialConfig;
 
@@ -56,13 +69,11 @@ function createConsumer(useConfig: ReturnType<typeof setupConfig<ConfigExample>>
 }
 
 let client: QueryClient | null = null;
-function setup(updater: () => Promise<ConfigExample>, buster?: string) {
-  const [a, b, c] = setupConfig(
-    initialConfigDef,
-    updater,
-    { gcTime: Infinity, retry: false },
-    buster
-  );
+function setup(updater: () => Promise<ConfigExample>, options?: SetupConfigOptions<ConfigExample>) {
+  const [a, b, c] = setupConfig(initialConfigDef, updater, {
+    queryOptions: { gcTime: Infinity, retry: false },
+    ...options,
+  });
   client = c;
   return [createWrapper(a), b, c] as const;
 }
@@ -89,7 +100,7 @@ describe('setupConfig', () => {
     };
     nock(window.location.href).get('/config').reply(200, exampleReturn);
 
-    const [wrapper, hook] = setup(webUpdater, 'web');
+    const [wrapper, hook] = setup(webUpdater, { buster: 'web' });
     const { result } = renderHook(hook, { wrapper });
 
     act(() => {
@@ -103,7 +114,7 @@ describe('setupConfig', () => {
 
 describe('Config persistence', () => {
   it('should save to localStorage', async () => {
-    const [wrapper, hook] = setup(numUpdater, 'save');
+    const [wrapper, hook] = setup(numUpdater, { buster: 'save' });
 
     const { result } = renderHook(hook, { wrapper });
     act(() => {
@@ -111,21 +122,16 @@ describe('Config persistence', () => {
     });
 
     await waitFor(() => expect(result.current.config.num).toEqual(1));
-    await waitFor(() =>
-      expect(
-        JSON.parse(localStorage.getItem('REACT_QUERY_OFFLINE_CACHE') || '').clientState.queries[0]
-          .state.data.num
-      ).toBe(1)
-    );
+    await waitFor(() => testStorageCache(localStorage, 'num', 1));
   });
 
   it('should restore from localStorage', async () => {
     localStorage.setItem(
-      'REACT_QUERY_OFFLINE_CACHE',
+      storageKey,
       `{"buster":"load","timestamp":${Date.now()},"clientState":{"mutations":[],"queries":[{"state":{"data":{"API_URL":"https://api.example.com","num":1},"dataUpdateCount":2,"dataUpdatedAt":${Date.now()},"error":null,"errorUpdateCount":0,"errorUpdatedAt":0,"fetchFailureCount":0,"fetchFailureReason":null,"fetchMeta":null,"isInvalidated":false,"status":"success","fetchStatus":"idle"},"queryKey":["config"],"queryHash":"[\\"config\\"]"}]}}`
     );
 
-    const [wrapper, hook] = setup(staticUpdater, 'load');
+    const [wrapper, hook] = setup(staticUpdater, { buster: 'load' });
 
     const { result: isRestoring } = renderHook(useIsRestoring, { wrapper });
 
@@ -133,5 +139,18 @@ describe('Config persistence', () => {
 
     const { result } = renderHook(hook, { wrapper });
     await waitFor(() => expect(result.current.config.num).toEqual(1));
+  });
+});
+
+describe('Custom persisters', () => {
+  it('should load sync persister', async () => {
+    const storagePersister = createSyncStoragePersister({ storage: sessionStorage });
+    const [wrapper, hook] = setup(numUpdater, { buster: 'sync', persister: storagePersister });
+    const { result } = renderHook(hook, { wrapper });
+    act(() => {
+      result.current.refetch();
+    });
+    await waitFor(() => expect(result.current.config.num).toEqual(1));
+    await waitFor(() => expect(testStorageCache(sessionStorage, 'num', 1)), { timeout: 3000 });
   });
 });

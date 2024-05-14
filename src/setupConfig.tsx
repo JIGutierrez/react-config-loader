@@ -4,16 +4,18 @@ import {
   QueryClientProvider,
   useQuery,
 } from '@tanstack/react-query';
-import type { ConfigDef, ConfigOptions, ConfigUpdater } from './types';
+import type { ConfigDef, ConfigQueryOptions, ConfigUpdater, SetupConfigOptions } from './types';
 import React, { useEffect } from 'react';
 import { createConfigFromDefinition } from './createConfigFromDefinition';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
-import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import { PersistQueryClientProvider, Persister } from '@tanstack/react-query-persist-client';
 
-const ConfigProvider = (client: QueryClient, buster?: string) => {
-  const localStoragePersister = createSyncStoragePersister({
-    storage: window.localStorage,
-  });
+const ConfigProvider = (client: QueryClient, persister?: Persister, buster?: string) => {
+  const localStoragePersister =
+    persister ||
+    createSyncStoragePersister({
+      storage: window.localStorage,
+    });
 
   return ({ children }: { children: React.ReactNode }) => (
     <PersistQueryClientProvider
@@ -25,7 +27,7 @@ const ConfigProvider = (client: QueryClient, buster?: string) => {
   );
 };
 
-const defaultOptions: ConfigOptions = {
+const defaultOptions: ConfigQueryOptions = {
   staleTime: 0,
   gcTime: 1000 * 60 * 60 * 24,
   refetchOnMount: true,
@@ -37,17 +39,16 @@ const defaultOptions: ConfigOptions = {
 export function setupConfig<T extends object>(
   initialConfig: ConfigDef<T>,
   updater: ConfigUpdater<T>,
-  options?: ConfigOptions,
-  buster?: string
+  options?: SetupConfigOptions<T>
 ) {
-  const mergedOptions = { ...defaultOptions, ...options };
+  const mergedOptions = { ...defaultOptions, ...options?.queryOptions };
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: mergedOptions,
     },
   });
 
-  const provider = ConfigProvider(queryClient, buster);
+  const provider = ConfigProvider(queryClient, options?.persister, options?.buster);
 
   const hook = useConfigCreator<T>(createConfigFromDefinition(initialConfig), updater);
 
