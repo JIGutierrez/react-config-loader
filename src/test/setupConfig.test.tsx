@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { setupConfig } from '../setupConfig';
-import type { ConfigDef, SetupConfigOptions } from '../types';
-import { act, render, renderHook, waitFor } from '@testing-library/react';
+import type { SetupConfigOptions } from '../types';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import nock from 'nock';
 import axios from 'axios';
 import { QueryClient, useIsRestoring } from '@tanstack/react-query';
@@ -15,18 +15,9 @@ interface ConfigExample {
   num: number;
 }
 
-export const initialConfig: ConfigExample = {
+const initialConfig: ConfigExample = {
   API_URL: 'https://api.example.com',
   num: 0,
-};
-
-const initialConfigDef: ConfigDef<ConfigExample> = {
-  API_URL: {
-    initialValue: 'https://api.example.com',
-  },
-  num: {
-    initialValue: 0,
-  },
 };
 
 const storageKey = 'REACT_QUERY_OFFLINE_CACHE';
@@ -70,7 +61,7 @@ function createConsumer(useConfig: ReturnType<typeof setupConfig<ConfigExample>>
 
 let client: QueryClient | null = null;
 function setup(updater: () => Promise<ConfigExample>, options?: SetupConfigOptions<ConfigExample>) {
-  const [a, b, c] = setupConfig(initialConfigDef, updater, {
+  const [a, b, c] = setupConfig(initialConfig, updater, {
     queryOptions: { gcTime: Infinity, retry: false },
     ...options,
   });

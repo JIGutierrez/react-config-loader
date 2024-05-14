@@ -1,30 +1,7 @@
 import { QueryObserverOptions } from '@tanstack/react-query';
-import { AsyncStorage, Persister } from '@tanstack/react-query-persist-client';
+import { Persister } from '@tanstack/react-query-persist-client';
 
-export type ConfigDef<T extends object> = {
-  [K in RequiredKeys<T>]: RequiredConfigDefinition<T[K]>;
-} & {
-  [K in Exclude<keyof T, RequiredKeys<T>>]?: OptionalConfigDefinition<T[K]>;
-};
-
-export type StoredConfig<T extends object> = {
-  [K in RequiredKeys<T>]: T[K];
-} & {
-  [K in Exclude<keyof T, RequiredKeys<T>>]?: T[K];
-};
-
-type RequiredKeys<T> = {
-  [K in keyof T]-?: {} extends Pick<T, K> ? never : K;
-}[keyof T];
-
-interface OptionalConfigDefinition<V> {
-  initialValue?: V;
-  onLoad?: boolean;
-}
-
-interface RequiredConfigDefinition<V> extends OptionalConfigDefinition<V> {
-  initialValue: V;
-}
+export type ConfigDef<T> = Partial<T>;
 
 /**
  * Function that updates the config.

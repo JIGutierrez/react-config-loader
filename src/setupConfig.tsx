@@ -5,8 +5,7 @@ import {
   useQuery,
 } from '@tanstack/react-query';
 import type { ConfigDef, ConfigQueryOptions, ConfigUpdater, SetupConfigOptions } from './types';
-import React, { useEffect } from 'react';
-import { createConfigFromDefinition } from './createConfigFromDefinition';
+import React from 'react';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { PersistQueryClientProvider, Persister } from '@tanstack/react-query-persist-client';
 
@@ -50,12 +49,12 @@ export function setupConfig<T extends object>(
 
   const provider = ConfigProvider(queryClient, options?.persister, options?.buster);
 
-  const hook = useConfigCreator<T>(createConfigFromDefinition(initialConfig), updater);
+  const hook = useConfigCreator<T>(initialConfig, updater);
 
   return [provider, hook, queryClient] as const;
 }
 
-function useConfigCreator<T extends object>(initialConfig: T, updater: ConfigUpdater<T>) {
+function useConfigCreator<T extends object>(initialConfig: Partial<T>, updater: ConfigUpdater<T>) {
   return () => {
     const hook = useQuery({ queryFn: updater, queryKey: ['config'], initialData: initialConfig });
     return { ...hook, config: hook.data };
