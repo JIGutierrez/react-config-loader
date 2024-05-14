@@ -1,2 +1,2 @@
 export { setupConfig } from './setupConfig';
-export type { ConfigDef, ConfigOptions, ConfigUpdater } from './types';
+export { ConfigDef, ConfigOptions, ConfigUpdater } from './types';
