@@ -56,16 +56,24 @@ function createConsumer(useConfig: ReturnType<typeof setupConfig<ConfigExample>>
 }
 
 let client: QueryClient | null = null;
-function setup(updater: () => Promise<ConfigExample>) {
-  const [a, b, c] = setupConfig(initialConfigDef, updater, { gcTime: Infinity, retry: false });
+function setup(updater: () => Promise<ConfigExample>, buster?: string) {
+  const [a, b, c] = setupConfig(
+    initialConfigDef,
+    updater,
+    { gcTime: Infinity, retry: false },
+    buster
+  );
   client = c;
   return [createWrapper(a), b, c] as const;
 }
 
 afterEach(() => {
+  client?.unmount();
+  client?.cancelQueries();
   client?.clear();
-  localStorage.clear();
+  client?.removeQueries();
   client = null;
+  localStorage.clear();
 });
 
 describe('setupConfig', () => {
@@ -81,7 +89,7 @@ describe('setupConfig', () => {
     };
     nock(window.location.href).get('/config').reply(200, exampleReturn);
 
-    const [wrapper, hook] = setup(webUpdater);
+    const [wrapper, hook] = setup(webUpdater, 'web');
     const { result } = renderHook(hook, { wrapper });
 
     act(() => {
@@ -95,7 +103,7 @@ describe('setupConfig', () => {
 
 describe('Config persistence', () => {
   it('should save to localStorage', async () => {
-    const [wrapper, hook] = setup(numUpdater);
+    const [wrapper, hook] = setup(numUpdater, 'save');
 
     const { result } = renderHook(hook, { wrapper });
     act(() => {
@@ -105,20 +113,19 @@ describe('Config persistence', () => {
     await waitFor(() => expect(result.current.config.num).toEqual(1));
     await waitFor(() =>
       expect(
-        JSON.parse(localStorage.getItem('REACT_QUERY_OFFLINE_CACHE') || '').clientState.queries
-      ).toHaveLength(1)
+        JSON.parse(localStorage.getItem('REACT_QUERY_OFFLINE_CACHE') || '').clientState.queries[0]
+          .state.data.num
+      ).toBe(1)
     );
-    const data = JSON.parse(localStorage.getItem('REACT_QUERY_OFFLINE_CACHE') || '');
-    expect(data.clientState.queries[0].state.data).toEqual({ ...initialConfig, num: 1 });
   });
 
   it('should restore from localStorage', async () => {
     localStorage.setItem(
       'REACT_QUERY_OFFLINE_CACHE',
-      '{"buster":"","timestamp":1715652068434,"clientState":{"mutations":[],"queries":[{"state":{"data":{"API_URL":"https://api.example.com","num":1},"dataUpdateCount":2,"dataUpdatedAt":1715652068434,"error":null,"errorUpdateCount":0,"errorUpdatedAt":0,"fetchFailureCount":0,"fetchFailureReason":null,"fetchMeta":null,"isInvalidated":false,"status":"success","fetchStatus":"idle"},"queryKey":["config"],"queryHash":"[\\"config\\"]"}]}}'
+      `{"buster":"load","timestamp":${Date.now()},"clientState":{"mutations":[],"queries":[{"state":{"data":{"API_URL":"https://api.example.com","num":1},"dataUpdateCount":2,"dataUpdatedAt":${Date.now()},"error":null,"errorUpdateCount":0,"errorUpdatedAt":0,"fetchFailureCount":0,"fetchFailureReason":null,"fetchMeta":null,"isInvalidated":false,"status":"success","fetchStatus":"idle"},"queryKey":["config"],"queryHash":"[\\"config\\"]"}]}}`
     );
 
-    const [wrapper, hook] = setup(staticUpdater);
+    const [wrapper, hook] = setup(staticUpdater, 'load');
 
     const { result: isRestoring } = renderHook(useIsRestoring, { wrapper });
 

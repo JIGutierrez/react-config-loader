@@ -10,7 +10,7 @@ import { createConfigFromDefinition } from './createConfigFromDefinition';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 
-const ConfigProvider = (client: QueryClient) => {
+const ConfigProvider = (client: QueryClient, buster?: string) => {
   const localStoragePersister = createSyncStoragePersister({
     storage: window.localStorage,
   });
@@ -18,7 +18,7 @@ const ConfigProvider = (client: QueryClient) => {
   return ({ children }: { children: React.ReactNode }) => (
     <PersistQueryClientProvider
       client={client}
-      persistOptions={{ persister: localStoragePersister }}
+      persistOptions={{ persister: localStoragePersister, buster }}
     >
       {children}
     </PersistQueryClientProvider>
@@ -37,7 +37,8 @@ const defaultOptions: ConfigOptions = {
 export function setupConfig<T extends object>(
   initialConfig: ConfigDef<T>,
   updater: ConfigUpdater<T>,
-  options?: ConfigOptions
+  options?: ConfigOptions,
+  buster?: string
 ) {
   const mergedOptions = { ...defaultOptions, ...options };
   const queryClient = new QueryClient({
@@ -46,7 +47,7 @@ export function setupConfig<T extends object>(
     },
   });
 
-  const provider = ConfigProvider(queryClient);
+  const provider = ConfigProvider(queryClient, buster);
 
   const hook = useConfigCreator<T>(createConfigFromDefinition(initialConfig), updater);
 
