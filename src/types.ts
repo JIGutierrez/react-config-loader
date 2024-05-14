@@ -1,5 +1,4 @@
-import { QueryClientConfig, QueryOptions, UseQueryOptions } from '@tanstack/react-query';
-import type { Dispatch } from 'react';
+import { QueryObserverOptions } from '@tanstack/react-query';
 
 export type ConfigDef<T extends object> = {
   [K in RequiredKeys<T>]: RequiredConfigDefinition<T[K]>;
@@ -26,11 +25,15 @@ interface RequiredConfigDefinition<V> extends OptionalConfigDefinition<V> {
   initialValue: V;
 }
 
+/**
+ * Function that updates the config.
+ * @returns A promise that resolves to the new config.
+ * @typeParam T - The type of the config.
+ */
 export type ConfigUpdater<T> = () => Promise<T>;
 
-export type ConfigOptions = {
-  staleTime?: number;
-  refetchOnMount?: boolean;
-  retryDelay?: number | ((retryCount: number, error: Error) => number);
-  gcTime?: number;
-};
+/**
+ * Options for the react-query QueryClient
+ * @see https://react-query.tanstack.com/reference/QueryClient#defaultoptions
+ */
+export type ConfigOptions = Omit<QueryObserverOptions, 'queryKey' | 'queryFn' | 'initialData'>;
