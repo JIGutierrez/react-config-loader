@@ -16,7 +16,7 @@ export type ConfigUpdater<T> = () => Promise<T>;
  */
 export type ConfigQueryOptions = Omit<QueryObserverOptions, 'queryKey' | 'queryFn' | 'initialData'>;
 
-export type SetupConfigOptions<T extends object> = {
+export type SetupConfigOptions = {
   queryOptions?: ConfigQueryOptions;
   buster?: string;
   persister?: Persister;

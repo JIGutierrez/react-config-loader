@@ -38,7 +38,7 @@ const defaultOptions: ConfigQueryOptions = {
 export function setupConfig<T extends object>(
   initialConfig: ConfigDef<T>,
   updater: ConfigUpdater<T>,
-  options?: SetupConfigOptions<T>
+  options?: SetupConfigOptions
 ) {
   const mergedOptions = { ...defaultOptions, ...options?.queryOptions };
   const queryClient = new QueryClient({
