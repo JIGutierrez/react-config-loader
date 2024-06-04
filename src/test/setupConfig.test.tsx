@@ -60,7 +60,7 @@ function createConsumer(useConfig: ReturnType<typeof setupConfig<ConfigExample>>
 }
 
 let client: QueryClient | null = null;
-function setup(updater: () => Promise<ConfigExample>, options?: SetupConfigOptions<ConfigExample>) {
+function setup(updater: () => Promise<ConfigExample>, options?: SetupConfigOptions) {
   const [a, b, c] = setupConfig(initialConfig, updater, {
     queryOptions: { gcTime: Infinity, retry: false },
     ...options,
