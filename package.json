@@ -1,6 +1,6 @@
 {
   "name": "react-config-loader",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "React Hook for loading client-side configuration at runtime.",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
