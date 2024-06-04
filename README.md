@@ -41,7 +41,7 @@ const [ConfigProvider, useConfig] = setupConfig(config, updater);
 export { ConfigProvider, useConfig };
 ```
 
-Then, in your `main.tsx` (or the uppermost scope you'd like your config to be available in)
+Then, in your `main.tsx` (or the uppermost scope you'd like your config to be available in):
 
 ```tsx
 // main.tsx
@@ -76,9 +76,7 @@ In CSR applications, we usually have "environment variables" that are bundled in
 
 ### Solution
 
-The general idea is to have a static "file" (i.e, independent from the application build process) that all instances query at regular intervals for the intended values.
-
-This is achieved in this application using [`@tanstack/react-query`](https://tanstack.com/query) to provide an app-wide provider of your app's configuration. This is
+The general idea is to have a static "file" (i.e, independent from the application build process) that all instances query at regular intervals for the intended values. This is achieved in this application using [`@tanstack/react-query`](https://tanstack.com/query) to provide an app-wide provider of your app's configuration.
 
 ## API
 
@@ -125,7 +123,7 @@ This is achieved in this application using [`@tanstack/react-query`](https://tan
 
 ### Utils
 
-Simple utility functions
+Simple utility functions.
 
 #### `fetchConfig(url, options?): Promise<Response>`
 
