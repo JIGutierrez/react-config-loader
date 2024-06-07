@@ -14,7 +14,7 @@ In some section of your application, define:
 
 ```ts
 // setupConfig.ts
-import { setupConfig, ConfigDef, fetchJSON } from 'react-config-loader';
+import { setupConfig, fetchJSON } from 'react-config-loader';
 
 // It's recommended to do this setup in it's own file for easier importing
 
@@ -28,7 +28,7 @@ interface Config {
 
 // Define default values for all non-optional variables.
 
-const config: ConfigDef<Config> = {
+const config: Config = {
   API_URL: 'https://localhost:3000',
 };
 
@@ -84,7 +84,7 @@ The general idea is to have a static "file" (i.e, independent from the applicati
 
 ### `setupConfig<Config>(initialConfig, updater, options?)`
 
-- `initialConfig: ConfigDef<Config>`: An object with all non-optional keys from `Config` with a default value. This is the initial value for the configuration.
+- `initialConfig: Config`: An object with all non-optional keys from `Config` with a default value. This is the initial value for the configuration.
 - `updater: () => Promise<Config>` function that returns the updated configuration. Must throw on error. See [Utils](#Utils).
 - `options?: SetupConfigOptions`
 

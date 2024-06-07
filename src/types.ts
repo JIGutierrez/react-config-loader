@@ -1,8 +1,6 @@
 import { QueryObserverOptions } from '@tanstack/react-query';
 import { Persister } from '@tanstack/react-query-persist-client';
 
-export type ConfigDef<T> = Partial<T>;
-
 /**
  * Function that updates the config.
  * @returns A promise that resolves to the new config.
